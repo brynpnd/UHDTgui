@@ -29,6 +29,7 @@ public:
     void showBoundaryInput(void);
     void hideNoFlyInput(void);
     void showNoFlyInput(void);
+    void hideFPInput(void);
 
     JavascriptObject *myObject;
 
@@ -66,6 +67,9 @@ private slots:
     void on_removeBoundary_clicked();
     void on_removeNoFly_clicked();
     void on_finishRemove_clicked();
+    void on_createFP_clicked();
+    void on_confirmFP_clicked();
+    void on_returnHome_clicked();
 };
 
 #endif // MAP_H

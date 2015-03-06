@@ -55,6 +55,7 @@ Map::Map(QWidget *parent)
     // hide boundary input
     hideBoundaryInput();
     hideNoFlyInput();
+    hideFPInput();
     ui->finishRemove->setVisible(false);
 
 }
@@ -108,12 +109,7 @@ void Map::javascriptClick(void){
  */
 void Map::on_DrawShape_clicked()
 {
-    QString latline = ui->lat->text();
-    QString longline = ui->lng->text();
-
     showBoundaryInput();
-
-    // add current coordinates label
 }
 
 /* Given: None
@@ -136,7 +132,7 @@ void Map::hideBoundaryInput() {
 
     if(!(ui->removeBoundary->isVisible()))
         ui->DrawShape->setEnabled(true);
-
+    ui->createFP->setEnabled(true);
     ui->PutMarker->setEnabled(true);
     ui->ClearMarker->setEnabled(true);
     ui->DrawNoFly->setEnabled(true);
@@ -161,6 +157,7 @@ void Map::showBoundaryInput() {
 
     ui->PutMarker->setEnabled(false);
     ui->ClearMarker->setEnabled(false);
+    ui->createFP->setEnabled(false);
     ui->DrawNoFly->setEnabled(false);
     ui->removeNoFly->setEnabled(false);
 
@@ -185,6 +182,7 @@ void Map::hideNoFlyInput() {
     ui->removeNoFly->setHidden(true);
     ui->DrawNoFly->setHidden(false);
 
+    ui->createFP->setEnabled(true);
     ui->DrawNoFly->setEnabled(true);
     ui->PutMarker->setEnabled(true);
     ui->ClearMarker->setEnabled(true);
@@ -213,10 +211,37 @@ void Map::showNoFlyInput() {
     ui->PutMarker->setEnabled(false);
     ui->ClearMarker->setEnabled(false);
     ui->DrawShape->setEnabled(false);
+    ui->createFP->setEnabled(false);
     ui->removeBoundary->setEnabled(false);
     ui->removeNoFly->setEnabled(false);
 
     ui->boundCoordinates->setText("No no-fly zone coordinates input.");
+}
+
+void Map::hideFPInput() {
+
+    ui->latFP->setHidden(true);
+    ui->lngFP->setHidden(true);
+    ui->addFP->setHidden(true);
+    ui->confirmFP->setHidden(true);
+    ui->undoFP->setHidden(true);
+    ui->copyFP->setHidden(true);
+    ui->inputLatLabelFP->setHidden(true);
+    ui->inputLongLabelFP->setHidden(true);
+    ui->returnHome->setHidden(true);
+    ui->boundCoordinates->setHidden(true);
+
+    ui->createFP->setEnabled(true);
+    ui->DrawNoFly->setEnabled(true);
+    ui->PutMarker->setEnabled(true);
+    ui->DrawShape->setEnabled(true);
+    if(!(ui->removeBoundary->isVisible()))
+        ui->ClearMarker->setEnabled(true);
+
+    /*
+    if(!(ui->removeBoundary->isVisible()))
+        ui->DrawShape->setEnabled(true);
+    */
 }
 
 /* Slot function:
@@ -716,4 +741,36 @@ void Map::on_finishRemove_clicked()
 
     else
         ui->removeNoFly->setHidden(true);
+}
+
+void Map::on_createFP_clicked()
+{
+    ui->latFP->setHidden(false);
+    ui->lngFP->setHidden(false);
+    ui->addFP->setHidden(false);
+    ui->confirmFP->setHidden(false);
+    ui->undoFP->setHidden(false);
+    ui->copyFP->setHidden(false);
+    ui->inputLatLabelFP->setHidden(false);
+    ui->inputLongLabelFP->setHidden(false);
+    ui->boundCoordinates->setHidden(false);
+
+    ui->createFP->setEnabled(false);
+    ui->PutMarker->setEnabled(false);
+    ui->ClearMarker->setEnabled(false);
+    ui->DrawShape->setEnabled(false);
+    ui->DrawNoFly->setEnabled(false);
+    ui->removeNoFly->setEnabled(false);
+
+    ui->boundCoordinates->setText("No boundary coordinates input.");
+}
+
+void Map::on_confirmFP_clicked()
+{
+    ui->returnHome->setHidden(false);
+}
+
+void Map::on_returnHome_clicked()
+{
+    hideFPInput();
 }

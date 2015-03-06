@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1010</width>
-    <height>521</height>
+    <width>1090</width>
+    <height>459</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Map</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_11">
+  <layout class="QVBoxLayout" name="verticalLayout_27">
    <item>
     <widget class="QMenuBar" name="menuBar"/>
    </item>
@@ -31,16 +31,23 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
+        <widget class="QPushButton" name="createFP">
+         <property name="text">
+          <string>Create Flight Plan</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="PutMarker">
          <property name="text">
-          <string>Place Waypoint</string>
+          <string>Place Marker</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="ClearMarker">
          <property name="text">
-          <string>Clear Waypoints</string>
+          <string>Clear Markers</string>
          </property>
         </widget>
        </item>
@@ -102,9 +109,9 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <layout class="QHBoxLayout" name="horizontalLayout_18">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_9">
+      <layout class="QVBoxLayout" name="verticalLayout_26">
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
@@ -204,7 +211,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="latNoFly"/>
+              <widget class="QLineEdit" name="latNoFly">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -275,6 +286,102 @@
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_22">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_23">
+             <item>
+              <widget class="QLabel" name="inputLatLabelFP">
+               <property name="text">
+                <string>Input Latitude:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="latFP">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_24">
+             <item>
+              <widget class="QLabel" name="inputLongLabelFP">
+               <property name="text">
+                <string>Input Longitude:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lngFP"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_25">
+             <item>
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>17</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="confirmFP">
+               <property name="text">
+                <string>Finish</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="returnHome">
+               <property name="text">
+                <string>Return Home?</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <item>
+            <widget class="QPushButton" name="addFP">
+             <property name="text">
+              <string>Add</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="undoFP">
+             <property name="text">
+              <string>Undo</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="copyFP">
+             <property name="text">
+              <string>Copy from Current Coordinates</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
      <item>
@@ -315,8 +422,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>menuBar</zorder>
-  <zorder>webView</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
