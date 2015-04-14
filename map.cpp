@@ -13,6 +13,7 @@
 #define WAYPOINT 0
 #define BOUNDARY 1
 #define NOFLYZONE 2
+#define FLIGHTPLAN 3
 
 /* Given: The widget that the object belongs to
  * Returns: None
@@ -28,6 +29,7 @@ Map::Map(QWidget *parent)
     ui->setupUi(this);
     boundIndex = 0;
     noFlyIndex = 0;
+    FPIndex = 0;
 
     QString content;
     QString fileName = ":/index.html";
@@ -75,7 +77,7 @@ void Map::on_PutMarker_clicked()
     QString latline = ui->lat->text();
     QString longline = ui->lng->text();
 
-    QString marker = QString("markers(%1,%2,%3,'You clicked me'); null")
+    QString marker = QString("markers(%1,%2,%3,'You clicked me',0); null")
             .arg(latline)
             .arg(longline)
             .arg(WAYPOINT);
@@ -228,7 +230,9 @@ void Map::hideFPInput() {
     ui->copyFP->setHidden(true);
     ui->inputLatLabelFP->setHidden(true);
     ui->inputLongLabelFP->setHidden(true);
-    ui->returnHome->setHidden(true);
+    ui->returnHomeLabel->setHidden(true);
+    ui->returnHomeYes->setHidden(true);
+    ui->returnHomeNo->setHidden(true);
     ui->boundCoordinates->setHidden(true);
 
     ui->createFP->setEnabled(true);
@@ -237,11 +241,6 @@ void Map::hideFPInput() {
     ui->DrawShape->setEnabled(true);
     if(!(ui->removeBoundary->isVisible()))
         ui->ClearMarker->setEnabled(true);
-
-    /*
-    if(!(ui->removeBoundary->isVisible()))
-        ui->DrawShape->setEnabled(true);
-    */
 }
 
 /* Slot function:
@@ -291,7 +290,7 @@ void Map::on_addBound_clicked()
         boundLats.insert(latnum, boundIndex);
         boundLongs.insert(longnum, boundIndex);
 
-        QString boundmarker = QString("markers(%1,%2,%3,'You clicked me'); null")
+        QString boundmarker = QString("markers(%1,%2,%3,'You clicked me',0); null")
                 .arg(boundLats.get(boundIndex))
                 .arg(boundLongs.get(boundIndex))
                 .arg(BOUNDARY);
@@ -350,6 +349,20 @@ void Map::listBoundCoordinates() {
     ui->boundCoordinates->setText(coordinates);
 }
 
+void Map::listFPCoordinates() {
+    QString coordinates;
+    for(int i = 0; i < FPIndex; i++) {
+        QString appendStr = QString("Point %1: %2, %3\n")
+                .arg(i+1)
+                .arg(FPLats.get(i))
+                .arg(FPLongs.get(i));
+        coordinates.append(appendStr);
+    }
+
+    ui->boundCoordinates->setText(coordinates);
+}
+
+
 /* Slot function:
  * Signal: copyBound QPushButton being pressed
  * Purpose: Copies the coordinates from the clicked location to their respective containers.
@@ -365,7 +378,7 @@ void Map::on_copyBound_clicked()
     boundLats.insert(lat.toFloat(),boundIndex);
     boundLongs.insert(lng.toFloat(),boundIndex);
 
-    QString boundmarker = QString("markers(%1,%2,%3,'You clicked me'); null")
+    QString boundmarker = QString("markers(%1,%2,%3,'You clicked me',0); null")
             .arg(boundLats.get(boundIndex))
             .arg(boundLongs.get(boundIndex))
             .arg(BOUNDARY);
@@ -508,7 +521,7 @@ void Map::on_addNoFly_clicked()
         noFlyLats.insert(latnum, noFlyIndex);
         noFlyLongs.insert(longnum, noFlyIndex);
 
-        QString noflymarker = QString("markers(%1,%2,%3,'You clicked me'); null")
+        QString noflymarker = QString("markers(%1,%2,%3,'You clicked me',0); null")
                 .arg(noFlyLats.get(noFlyIndex))
                 .arg(noFlyLongs.get(noFlyIndex))
                 .arg(NOFLYZONE);
@@ -573,7 +586,7 @@ void Map::on_copyNoFly_clicked()
     noFlyLats.insert(lat.toFloat(),noFlyIndex);
     noFlyLongs.insert(lng.toFloat(),noFlyIndex);
 
-    QString noFlymarker = QString("markers(%1,%2,%3,'You clicked me'); null")
+    QString noFlymarker = QString("markers(%1,%2,%3,'You clicked me',0); null")
             .arg(noFlyLats.get(noFlyIndex))
             .arg(noFlyLongs.get(noFlyIndex))
             .arg(NOFLYZONE);
@@ -767,10 +780,148 @@ void Map::on_createFP_clicked()
 
 void Map::on_confirmFP_clicked()
 {
-    ui->returnHome->setHidden(false);
+    ui->returnHomeYes->setHidden(false);
+    ui->returnHomeNo->setHidden(false);
+    ui->returnHomeLabel->setHidden(false);
 }
 
-void Map::on_returnHome_clicked()
+void Map::on_returnHomeYes_clicked()
 {
     hideFPInput();
+    // draw Flight Plan line between first and last point
+    if(FPIndex > 2) {
+        QString FPline = QString("drawPolyLine(%1,%2,%3,%4,%5,%6); null")
+            .arg(FPLats.get(0))
+            .arg(FPLongs.get(0))
+            .arg(FPLats.get(FPIndex-1))
+            .arg(FPLongs.get(FPIndex-1))
+            .arg(FLIGHTPLAN)
+            .arg(FPIndex);
+
+        ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
+    }
+}
+
+void Map::on_returnHomeNo_clicked()
+{
+    hideFPInput();
+}
+
+void Map::on_addFP_clicked()
+{
+    QString lat = ui->latFP->text();
+    QString lng = ui->lngFP->text();
+
+    int errorlat = 0;
+    int errorlong = 0;
+
+    // check if coordinate is in correct format
+    QRegExp rx = QRegExp("^[-+]?([0-9]|[1-9][0-9]|[1][0-7][0-9])(\\.[1-9]|.[0-9]{1,5}[1-9])?$");
+
+    if(rx.exactMatch(lat))
+        errorlat = 0;
+
+    else if(lat.toInt() == 180)
+        errorlat = 0;
+
+    else if(lat.toInt() == -180)
+        errorlat = 0;
+
+    else
+        errorlat = 1;
+
+    if(rx.exactMatch(lng))
+        errorlong = 0;
+
+    else if(lng.toInt() == 180)
+        errorlong = 0;
+
+    else if(lng.toInt() == -180)
+        errorlong = 0;
+
+    else
+        errorlong = 1;
+
+    if(errorlat == 0 && errorlong == 0) {
+        float latnum = lat.toFloat();
+        float longnum = lng.toFloat();
+        FPLats.insert(latnum, FPIndex);
+        FPLongs.insert(longnum, FPIndex);
+
+        QString FPmarker = QString("markers(%1,%2,%3,'You clicked me',%4);")
+                .arg(FPLats.get(FPIndex))
+                .arg(FPLongs.get(FPIndex))
+                .arg(FLIGHTPLAN)
+                .arg(FPIndex);
+
+        QVariant markerValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPmarker);
+
+         // draw Flight Plan line between last two points
+        if(markerValid.toBool() == true) {
+             if(FPIndex > 0) {
+                 QString FPline = QString("drawPolyLine(%1,%2,%3,%4,%5,%6);")
+                     .arg(FPLats.get(FPIndex))
+                     .arg(FPLongs.get(FPIndex))
+                     .arg(FPLats.get(FPIndex-1))
+                     .arg(FPLongs.get(FPIndex-1))
+                     .arg(FLIGHTPLAN)
+                     .arg(FPIndex);
+
+                 ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
+             }
+
+
+            FPIndex++;
+            listFPCoordinates();
+        }
+
+    }
+
+    // append function?
+    else if(errorlat == 1 && errorlong == 0)
+        ui->boundCoordinates->append("Invalid latitude.");
+
+    else if(errorlong == 1 && errorlat == 0)
+        ui->boundCoordinates->append("Invalid longitude.");
+
+    else
+        ui->boundCoordinates->append("Invalid latitude and longitude.");
+}
+
+void Map::on_copyFP_clicked()
+{
+    QString lat = ui->lat->text();
+    QString lng = ui->lng->text();
+
+    // insert function?
+    FPLats.insert(lat.toFloat(),FPIndex);
+    FPLongs.insert(lng.toFloat(),FPIndex);
+
+    QString FPmarker = QString("markers(%1,%2,%3,'You clicked me',%4);")
+            .arg(FPLats.get(FPIndex))
+            .arg(FPLongs.get(FPIndex))
+            .arg(FLIGHTPLAN)
+            .arg(FPIndex);
+
+     QVariant markerValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPmarker);
+
+     qDebug() << markerValid.toBool();
+
+     // draw boundary line between last two points
+     if(markerValid.toBool() == true) {
+         if(FPIndex > 0) {
+             QString FPline = QString("drawPolyLine(%1,%2,%3,%4,%5);")
+                 .arg(FPLats.get(FPIndex))
+                 .arg(FPLongs.get(FPIndex))
+                 .arg(FPLats.get(FPIndex-1))
+                 .arg(FPLongs.get(FPIndex-1))
+                 .arg(FLIGHTPLAN);
+
+             ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
+         }
+
+
+         FPIndex++;
+         listFPCoordinates();
+     }
 }

@@ -12,6 +12,7 @@
     var mymarkers = [];
     var boundmarkers = [];
     var noflymarkers = [];
+    var FPmarkers = [];
     var polyCoordinates = [];
     var boundary;
     var noflyzone = [];
@@ -22,6 +23,7 @@
     var noflylisteners = [];
 
     var lines = [];
+    var FPlines = [];
 
     function init(lat, lng) {
         var mapOptions = {
@@ -50,87 +52,141 @@
     }
 
     var infowindow = new google.maps.InfoWindow();
-    function markers(one, two, three, message) {
+    function markers(one, two, three, message, index) {
 
-    var coordinates = new google.maps.LatLng(one,two);
+        var coordinates = new google.maps.LatLng(one,two);
+        var marker;
 
-    if(boundMode == true) {
+        if(boundMode == true) {
 
-        if(!boundary.containsLatLng(coordinates))
-            valid = 0;
+            if(!boundary.containsLatLng(coordinates))
+                valid = 0;
 
-        if(valid == 0 && three != 2) {
+            if(valid == 0 && three != 2) {
 
-            // make a function
+                // make a function
+                var string = 'Invalid Coordinates!';
+
+                infowindow.setContent(string);
+                infowindow.setPosition(coordinates);
+                infowindow.open(map);
+
+                return false;
+            }
+
+        }
+
+        if(noFlyMode == true) {
+
+            for(var i = 0; i < noflyzone.length; i++) {
+                if(noflyzone[i].containsLatLng(coordinates))
+                    valid = 0;
+            }
+
+            if(valid == 0 && three == 0) {
+            var latlng = coordinates;
             var string = 'Invalid Coordinates!';
 
             infowindow.setContent(string);
-            infowindow.setPosition(coordinates);
+            infowindow.setPosition(latlng);
             infowindow.open(map);
 
-            return;
+            return false;
+            }
         }
 
-    }
-
-    if(noFlyMode == true) {
-
-        for(var i = 0; i < noflyzone.length; i++) {
-            if(noflyzone[i].containsLatLng(coordinates))
-                valid = 0;
-        }
-
-        if(valid == 0 && three == 0) {
-        var latlng = coordinates;
-        var string = 'Invalid Coordinates!';
-
-        infowindow.setContent(string);
-        infowindow.setPosition(latlng);
-        infowindow.open(map);
-
-        return;
-        }
-    }
-
-    if(three == 0) {
-        // create a marker at the given latitude and longitude
-        var marker = new google.maps.Marker({
-        position: coordinates,
-        map: map
-        });
-
-
-        mymarkers.push(marker);
-    }
-
-    else if(three == 1) {
-
-        var image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/aircraftsmall_zps2ae10092.png';
-
-        // create a marker at the given latitude and longitude
-        var marker = new google.maps.Marker({
+        if(three == 0) {
+            // create a marker at the given latitude and longitude
+            marker = new google.maps.Marker({
             position: coordinates,
-            map: map,
-            icon: image
-        });
+            map: map
+            });
 
-        boundmarkers.push(marker);
-        polyCoordinates.push(coordinates);
-    }
 
-    else if(three == 2) {
-        var image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/skull_zps3cab915d.png';
+            mymarkers.push(marker);
+        }
 
-        // create a marker at the given latitude and longitude
-        var marker = new google.maps.Marker({
-            position: coordinates,
-            map: map,
-            icon: image
-        });
+        else if(three == 1) {
 
-        noflymarkers.push(marker);
-        polyCoordinates.push(coordinates);
-    }
+            var image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/aircraftsmall_zps2ae10092.png';
+
+            // create a marker at the given latitude and longitude
+            marker = new google.maps.Marker({
+                position: coordinates,
+                map: map,
+                icon: image
+            });
+
+            boundmarkers.push(marker);
+            polyCoordinates.push(coordinates);
+        }
+
+        else if(three == 2) {
+            var image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/skull_zps3cab915d.png';
+
+            // create a marker at the given latitude and longitude
+            marker = new google.maps.Marker({
+                position: coordinates,
+                map: map,
+                icon: image
+            });
+
+            noflymarkers.push(marker);
+            polyCoordinates.push(coordinates);
+        }
+
+        else if(three == 3) {
+
+            var image;
+
+            switch(index) {
+
+                case 0: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_1_zpsoslok5ar.png'; break;
+                case 1: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_2_zpsrwi5wb7a.png'; break;
+                case 2: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_3_zpsog2rtb13.png'; break;
+                case 3: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_4_zpsokz58qcg.png'; break;
+                case 4: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_5_zpsivhcbwq8.png'; break;
+                case 5: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_6_zpshcwjwniu.png'; break;
+                case 6: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_7_zpsb3erjegj.png'; break;
+                case 7: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_8_zpsm2tjg28w.png'; break;
+                case 8: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_9_zpsqutj8eah.png'; break;
+                case 9: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_10_zpsx6qhwllh.png'; break;
+                case 10: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_11_zpszqsdrx7o.png'; break;
+                case 11: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_12_zpsk2f99zka.png'; break;
+                case 12: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_13_zpsebupt7mi.png'; break;
+                case 13: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_14_zpszn01dfo3.png'; break;
+                case 14: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_15_zpsjv176qpq.png'; break;
+                case 15: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_16_zps4tbbmh4x.png'; break;
+                case 16: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_17_zpseydvslvv.png'; break;
+                case 17: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_18_zpsnbb5ztvs.png'; break;
+                case 18: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_19_zpsrqsucspr.png'; break;
+                case 19: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_20_zpssarzqvjb.png'; break;
+                case 20: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_21_zpssfkomjwy.png'; break;
+                case 21: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_22_zpsnxw6buip.png'; break;
+                case 22: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_23_zps9qrtdi8v.png'; break;
+                case 23: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_24_zpsl1ryes1v.png'; break;
+                case 24: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_25_zpsu1au13rm.png'; break;
+                case 25: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_26_zpsaubrcf3n.png'; break;
+                case 26: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_27_zpsvug4evxw.png'; break;
+                case 27: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_28_zps2rp8wql5.png'; break;
+                case 28: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_29_zpscuk1pw9t.png'; break;
+                case 29: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_30_zpssrgqgi0t.png'; break;
+                default: break;
+
+            }
+
+
+            // create a marker at the given latitude and longitude
+            marker = new google.maps.Marker({
+                position: coordinates,
+                map: map,
+                icon: image,
+                zIndex: 2
+            });
+
+            FPmarkers.push(marker);
+
+        }
 
         // add the listener with the message to the marker
         google.maps.event.addListener(marker, 'click', (function(marker) {
@@ -140,6 +196,7 @@
                 }
         })(marker));
 
+        return true;
 
     }
 
@@ -212,9 +269,11 @@
             strokeOpacity: 1.0,
             strokeWeight: 2
             });
+
+            lines.push(flightPath);
         }
 
-       if(mode == 2) {
+       else if(mode == 2) {
             var flightPath = new google.maps.Polyline({
             path: flightPlanCoordinates,
             geodesic: true,
@@ -222,11 +281,26 @@
             strokeOpacity: 1.0,
             strokeWeight: 2
             });
+
+            lines.push(flightPath);
+        }
+
+        else if(mode == 3) {
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: '#FFFF00',
+                strokeOpacity: 1.0,
+                strokeWeight: 4,
+                zIndex: 2
+            });
+
+            FPlines.push(flightPath);
+
         }
 
         flightPath.setMap(map);
 
-        lines.push(flightPath);
     }
 
     function removeLines() {

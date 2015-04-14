@@ -37,6 +37,7 @@ public:
     void clearBoundCoordinates(void);
     void listNoFlyCoordinates(void);
     void clearNoFlyCoordinates(void);
+    void listFPCoordinates(void);
 
 private:
     Ui::Map *ui;
@@ -44,10 +45,13 @@ private:
     Container boundLongs;
     Container noFlyLats;
     Container noFlyLongs;
+    Container FPLats;
+    Container FPLongs;
 
 
     int boundIndex;
     int noFlyIndex;
+    int FPIndex;
 
 private slots:
     void on_ClearMarker_clicked();
@@ -69,7 +73,10 @@ private slots:
     void on_finishRemove_clicked();
     void on_createFP_clicked();
     void on_confirmFP_clicked();
-    void on_returnHome_clicked();
+    void on_returnHomeYes_clicked();
+    void on_returnHomeNo_clicked();
+    void on_addFP_clicked();
+    void on_copyFP_clicked();
 };
 
 #endif // MAP_H

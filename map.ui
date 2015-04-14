@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Map</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_27">
+  <layout class="QVBoxLayout" name="verticalLayout_13">
    <item>
     <widget class="QMenuBar" name="menuBar"/>
    </item>
@@ -109,9 +109,9 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_18">
+    <layout class="QHBoxLayout" name="horizontalLayout_13">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_26">
+      <layout class="QVBoxLayout" name="verticalLayout_12">
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
@@ -287,9 +287,9 @@
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_22">
+        <layout class="QVBoxLayout" name="verticalLayout_11">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_23">
              <item>
@@ -323,7 +323,7 @@
             </layout>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_25">
+            <layout class="QVBoxLayout" name="verticalLayout_9">
              <item>
               <spacer name="verticalSpacer_6">
                <property name="orientation">
@@ -345,18 +345,36 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="returnHome">
+              <widget class="QLabel" name="returnHomeLabel">
                <property name="text">
                 <string>Return Home?</string>
                </property>
               </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QPushButton" name="returnHomeYes">
+                 <property name="text">
+                  <string>Yes</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="returnHomeNo">
+                 <property name="text">
+                  <string>No</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_17">
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QPushButton" name="addFP">
              <property name="text">
