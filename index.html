@@ -295,11 +295,58 @@
                 zIndex: 2
             });
 
+            if(boundMode == true) {
+
+                var path = flightPath.getPath();
+                var length = path.length;
+                for(var i = 0; i < path.length; i++) {
+
+                    // use to get coordinates on path
+                    var coordinates = path.getAt(i);
+
+                    infoWindow.setContent(length + ", Here");
+                    infoWindow.setPosition(coordinates);
+                    infoWindow.open(map);
+
+                }
+
+/*
+                while(pathCopy.length > 0) {
+
+                    var pathCoordinates = pathCopy.pop();
+
+                    infoWindow.setContent("Here");
+                    infoWindow.setPosition(pathCoordinates);
+                    infoWindow.open(map);
+
+                    if(boundary.containsLatLng(pathCoordinates) === false) {
+                        flightPath.setMap(map);
+                        return false;
+                    }
+                }
+
+                for(var i = 0; i < path.length; i++) {
+
+                    var coordinates = path[i];
+
+                    infoWindow.setContent("Here");
+                    infoWindow.setPosition(pathCoordinates);
+                    infoWindow.open(map);
+
+                    if(boundary.containsLatLng(coordinates) == false) {
+                        flightPath.setMap(map);
+                        return false;
+                    }
+                }
+*/
+            }
+
             FPlines.push(flightPath);
 
         }
 
         flightPath.setMap(map);
+        return true;
 
     }
 

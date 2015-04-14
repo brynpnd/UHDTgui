@@ -905,8 +905,6 @@ void Map::on_copyFP_clicked()
 
      QVariant markerValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPmarker);
 
-     qDebug() << markerValid.toBool();
-
      // draw boundary line between last two points
      if(markerValid.toBool() == true) {
          if(FPIndex > 0) {
@@ -917,7 +915,10 @@ void Map::on_copyFP_clicked()
                  .arg(FPLongs.get(FPIndex-1))
                  .arg(FLIGHTPLAN);
 
-             ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
+             QVariant lineValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
+
+
+             qDebug() << lineValid.toBool();
          }
 
 
