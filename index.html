@@ -308,7 +308,7 @@
                 tempFP.setMap(null);
             }
 
-            if(boundMode == true) {
+            if(boundMode == true || noFlyMode == true) {
 
                 var path = flightPath.getPath();
                 var length = path.length;
@@ -349,6 +349,7 @@
 
                     if(boundMode == true) {
                         if(google.maps.geometry.poly.containsLocation(coord, boundary) == false) {
+                            flightPath.setOptions({strokeColor: '#FFA500'})
                             flightPath.setMap(map);
                             tempLine = true;
                             tempFP = flightPath;
@@ -360,10 +361,29 @@
                             return false;
                         }
                     }
+
+
+                    if(noFlyMode == true) {
+                        for(var j = 0; j < noflyzone.length; j++) {
+                            if(google.maps.geometry.poly.containsLocation(coord, noflyzone[j]) == true) {
+                                flightPath.setOptions({strokeColor: '#FFA500'})
+                                flightPath.setMap(map);
+                                tempLine = true;
+                                tempFP = flightPath;
+
+                                infoWindow.setContent("Invalid Path: Enters No-Fly Zone");
+                                infoWindow.setPosition(coord);
+                                infoWindow.open(map);
+
+                                return false;
+                            }
+                        }
+                    }
                 }
 
             }
 
+            tempLine = false;
             FPlines.push(flightPath);
 
         }

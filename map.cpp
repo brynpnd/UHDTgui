@@ -774,6 +774,7 @@ void Map::on_createFP_clicked()
     ui->DrawShape->setEnabled(false);
     ui->DrawNoFly->setEnabled(false);
     ui->removeNoFly->setEnabled(false);
+    ui->removeBoundary->setEnabled(false);
 
     ui->boundCoordinates->setText("No boundary coordinates input.");
 }
@@ -856,19 +857,27 @@ void Map::on_addFP_clicked()
 
         QVariant markerValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPmarker);
 
-         // draw Flight Plan line between last two points
+        // draw boundary line between last two points
         if(markerValid.toBool() == true) {
-             if(FPIndex > 0) {
-                 QString FPline = QString("drawPolyLine(%1,%2,%3,%4,%5,%6);")
-                     .arg(FPLats.get(FPIndex))
-                     .arg(FPLongs.get(FPIndex))
-                     .arg(FPLats.get(FPIndex-1))
-                     .arg(FPLongs.get(FPIndex-1))
-                     .arg(FLIGHTPLAN)
-                     .arg(FPIndex);
+            if(FPIndex > 0) {
+                QString FPline = QString("drawPolyLine(%1,%2,%3,%4,%5);")
+                    .arg(FPLats.get(FPIndex))
+                    .arg(FPLongs.get(FPIndex))
+                    .arg(FPLats.get(FPIndex-1))
+                    .arg(FPLongs.get(FPIndex-1))
+                    .arg(FLIGHTPLAN);
 
-                 ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
-             }
+                QVariant lineValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
+
+                if(lineValid.toBool() == false) {
+                   FPLats.remove(FPIndex);
+                   FPLongs.remove(FPIndex);
+                   FPIndex--;
+                }
+
+
+                qDebug() << lineValid.toBool();
+            }
 
 
             FPIndex++;
