@@ -917,6 +917,12 @@ void Map::on_copyFP_clicked()
 
              QVariant lineValid = ui->webView->page()->mainFrame()->evaluateJavaScript(FPline);
 
+             if(lineValid.toBool() == false) {
+                FPLats.remove(FPIndex);
+                FPLongs.remove(FPIndex);
+                FPIndex--;
+             }
+
 
              qDebug() << lineValid.toBool();
          }

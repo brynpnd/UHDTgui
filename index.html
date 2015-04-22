@@ -21,6 +21,8 @@
     var valid;
     var infoWindow;
     var noflylisteners = [];
+    var tempLine;
+    var tempFP;
 
     var lines = [];
     var FPlines = [];
@@ -184,6 +186,13 @@
                 zIndex: 2
             });
 
+            if(tempLine == true) {
+
+                var marker = FPmarkers.pop();
+                marker.setMap(null);
+
+            }
+
             FPmarkers.push(marker);
 
         }
@@ -295,50 +304,64 @@
                 zIndex: 2
             });
 
+            if(tempLine == true) {
+                tempFP.setMap(null);
+            }
+
             if(boundMode == true) {
 
                 var path = flightPath.getPath();
                 var length = path.length;
-                for(var i = 0; i < path.length; i++) {
-
-                    // use to get coordinates on path
-                    var coordinates = path.getAt(i);
-
-                    infoWindow.setContent(length + ", Here");
-                    infoWindow.setPosition(coordinates);
-                    infoWindow.open(map);
-
-                }
-
-/*
-                while(pathCopy.length > 0) {
-
-                    var pathCoordinates = pathCopy.pop();
-
-                    infoWindow.setContent("Here");
-                    infoWindow.setPosition(pathCoordinates);
-                    infoWindow.open(map);
-
-                    if(boundary.containsLatLng(pathCoordinates) === false) {
-                        flightPath.setMap(map);
-                        return false;
-                    }
-                }
+                var coordinates = [];
 
                 for(var i = 0; i < path.length; i++) {
 
-                    var coordinates = path[i];
+                    // get endpoints
+                    coordinates[i] = path.getAt(i);
 
-                    infoWindow.setContent("Here");
-                    infoWindow.setPosition(pathCoordinates);
-                    infoWindow.open(map);
 
-                    if(boundary.containsLatLng(coordinates) == false) {
-                        flightPath.setMap(map);
-                        return false;
+                }
+
+                // point A coordinates
+                var aLat = coordinates[0].lat();
+                var aLng = coordinates[0].lng();
+
+                // point B coordinates
+                var bLat = coordinates[1].lat();
+                var bLng = coordinates[1].lng();
+
+                // calculate distance between two points
+                var d = Math.sqrt(Math.pow((bLat - aLat), 2) + Math.pow((bLng - aLng), 2));
+
+                var step = 100;
+                var x;
+                var y;
+                var t;
+
+                for(var i = 0; i < step; i++){
+
+                    t = i / step;
+
+                    x = (1-t) * aLat + t * bLat;
+                    y = (1-t) * aLng + t * bLng;
+
+                    var coord = new google.maps.LatLng(x,y);
+
+                    if(boundMode == true) {
+                        if(google.maps.geometry.poly.containsLocation(coord, boundary) == false) {
+                            flightPath.setMap(map);
+                            tempLine = true;
+                            tempFP = flightPath;
+
+                            infoWindow.setContent("Invalid Path: Crosses Boundary");
+                            infoWindow.setPosition(coord);
+                            infoWindow.open(map);
+
+                            return false;
+                        }
                     }
                 }
-*/
+
             }
 
             FPlines.push(flightPath);
@@ -347,7 +370,6 @@
 
         flightPath.setMap(map);
         return true;
-
     }
 
     function removeLines() {
