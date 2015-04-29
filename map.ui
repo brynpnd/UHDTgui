@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1090</width>
-    <height>459</height>
+    <width>1173</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,6 +34,13 @@
         <widget class="QPushButton" name="createFP">
          <property name="text">
           <string>Create Flight Plan</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="simFlight">
+         <property name="text">
+          <string>Simulate Flight</string>
          </property>
         </widget>
        </item>
@@ -404,6 +411,45 @@
      </item>
      <item>
       <widget class="QTextBrowser" name="boundCoordinates"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="simLabel">
+     <property name="text">
+      <string>Simulation Options:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_14">
+     <item>
+      <widget class="QPushButton" name="startSim">
+       <property name="text">
+        <string>Start</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="simReset">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="driftBox">
+       <property name="text">
+        <string>Simulate Drift?</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="simFinish">
+       <property name="text">
+        <string>Finish</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

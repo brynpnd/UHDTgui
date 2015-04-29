@@ -30,6 +30,7 @@ Map::Map(QWidget *parent)
     boundIndex = 0;
     noFlyIndex = 0;
     FPIndex = 0;
+    timerOn = false;
 
     QString content;
     QString fileName = ":/index.html";
@@ -58,6 +59,7 @@ Map::Map(QWidget *parent)
     hideBoundaryInput();
     hideNoFlyInput();
     hideFPInput();
+    hideSimInput();
     ui->finishRemove->setVisible(false);
 
 }
@@ -234,6 +236,7 @@ void Map::hideFPInput() {
     ui->returnHomeYes->setHidden(true);
     ui->returnHomeNo->setHidden(true);
     ui->boundCoordinates->setHidden(true);
+    ui->simFlight->setHidden(true);
 
     ui->createFP->setEnabled(true);
     ui->DrawNoFly->setEnabled(true);
@@ -241,6 +244,27 @@ void Map::hideFPInput() {
     ui->DrawShape->setEnabled(true);
     if(!(ui->removeBoundary->isVisible()))
         ui->ClearMarker->setEnabled(true);
+}
+
+void Map::hideSimInput() {
+    ui->startSim->setHidden(true);
+    ui->simLabel->setHidden(true);
+    ui->simReset->setHidden(true);
+    ui->simFinish->setHidden(true);
+    ui->driftBox->setHidden(true);
+
+    ui->createFP->setEnabled(true);
+}
+
+void Map::showSimInput() {
+    ui->startSim->setHidden(false);
+    ui->simLabel->setHidden(false);
+    ui->simReset->setHidden(false);
+    ui->simReset->setEnabled(false);
+    ui->simFinish->setHidden(false);
+    ui->driftBox->setHidden(false);
+
+    ui->createFP->setEnabled(false);
 }
 
 /* Slot function:
@@ -784,11 +808,13 @@ void Map::on_confirmFP_clicked()
     ui->returnHomeYes->setHidden(false);
     ui->returnHomeNo->setHidden(false);
     ui->returnHomeLabel->setHidden(false);
+
 }
 
 void Map::on_returnHomeYes_clicked()
 {
     hideFPInput();
+    ui->simFlight->setHidden(false);
     // draw Flight Plan line between first and last point
     if(FPIndex > 2) {
         QString FPline = QString("drawPolyLine(%1,%2,%3,%4,%5,%6); null")
@@ -806,6 +832,7 @@ void Map::on_returnHomeYes_clicked()
 void Map::on_returnHomeNo_clicked()
 {
     hideFPInput();
+    ui->simFlight->setHidden(false);
 }
 
 void Map::on_addFP_clicked()
@@ -940,4 +967,50 @@ void Map::on_copyFP_clicked()
          FPIndex++;
          listFPCoordinates();
      }
+}
+
+void Map::on_simFlight_clicked()
+{
+        showSimInput();
+
+        QString plotDrone = QString("plotDrone();");
+        ui->webView->page()->mainFrame()->evaluateJavaScript(plotDrone);
+}
+
+void Map::on_startSim_clicked()
+{
+        timerOn = true;
+        timerId = startTimer(1000);
+        ui->simReset->setEnabled(true);
+}
+
+void Map::timerEvent(QTimerEvent *event) {
+    qDebug() << "Update...";
+
+    QString updateDrone = QString("updateDrone();");
+    QVariant continueSim = ui->webView->page()->mainFrame()->evaluateJavaScript(updateDrone);
+
+    qDebug() << continueSim.toBool();
+
+    if(continueSim.toBool() == false)
+        killTimer(timerId);
+}
+
+void Map::on_simReset_clicked()
+{
+    killTimer(timerId);
+
+    QString resetDrone = QString("resetDrone();");
+    ui->webView->page()->mainFrame()->evaluateJavaScript(resetDrone);
+}
+
+void Map::on_simFinish_clicked()
+{
+    if(timerOn)
+        killTimer(timerId);
+
+    QString removeDrone = QString("removeDrone();");
+    ui->webView->page()->mainFrame()->evaluateJavaScript(removeDrone);
+
+    hideFPInput();
 }

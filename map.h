@@ -30,6 +30,8 @@ public:
     void hideNoFlyInput(void);
     void showNoFlyInput(void);
     void hideFPInput(void);
+    void hideSimInput(void);
+    void showSimInput(void);
 
     JavascriptObject *myObject;
 
@@ -48,10 +50,15 @@ private:
     Container FPLats;
     Container FPLongs;
 
+    int timerId;
+    bool timerOn;
 
     int boundIndex;
     int noFlyIndex;
     int FPIndex;
+
+protected:
+    void timerEvent(QTimerEvent *event);
 
 private slots:
     void on_ClearMarker_clicked();
@@ -77,6 +84,10 @@ private slots:
     void on_returnHomeNo_clicked();
     void on_addFP_clicked();
     void on_copyFP_clicked();
+    void on_simFlight_clicked();
+    void on_startSim_clicked();
+    void on_simReset_clicked();
+    void on_simFinish_clicked();
 };
 
 #endif // MAP_H

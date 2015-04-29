@@ -23,6 +23,12 @@
     var noflylisteners = [];
     var tempLine;
     var tempFP;
+    var startingPoint;
+    var endPoint;
+    var droneMarker;
+    var pointsFP = [];
+    var tempPoints = [];
+    var FPindex = 0;
 
     var lines = [];
     var FPlines = [];
@@ -143,7 +149,7 @@
 
             switch(index) {
 
-                case 0: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_1_zpsoslok5ar.png'; break;
+                case 0: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_1_zpsoslok5ar.png'; startingPoint = coordinates; break;
                 case 1: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_2_zpsrwi5wb7a.png'; break;
                 case 2: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_3_zpsog2rtb13.png'; break;
                 case 3: image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/number_4_zpsokz58qcg.png'; break;
@@ -308,81 +314,90 @@
                 tempFP.setMap(null);
             }
 
-            if(boundMode == true || noFlyMode == true) {
 
-                var path = flightPath.getPath();
-                var length = path.length;
-                var coordinates = [];
+            var path = flightPath.getPath();
+            var length = path.length;
+            var coordinates = [];
 
-                for(var i = 0; i < path.length; i++) {
+            for(var i = 0; i < path.length; i++) {
 
-                    // get endpoints
-                    coordinates[i] = path.getAt(i);
+                // get endpoints
+                coordinates[i] = path.getAt(i);
 
+            }
 
+            // point A coordinates
+            var aLat = coordinates[1].lat();
+            var aLng = coordinates[1].lng();
+
+            // point B coordinates
+            var bLat = coordinates[0].lat();
+            var bLng = coordinates[0].lng();
+
+            endPoint = new google.maps.LatLng(bLat,bLng);
+
+            // calculate distance between two points
+            var d = Math.sqrt(Math.pow((bLat - aLat), 2) + Math.pow((bLng - aLng), 2));
+
+            var step = 100;
+            var x;
+            var y;
+            var t;
+
+            for(var i = 0; i < step; i++){
+
+                t = i / step;
+
+                x = (1-t) * aLat + t * bLat;
+                y = (1-t) * aLng + t * bLng;
+
+                var coord = new google.maps.LatLng(x,y);
+
+                pointsFP.push(coord);
+
+                if(boundMode == true) {
+                    if(google.maps.geometry.poly.containsLocation(coord, boundary) == false) {
+                        flightPath.setOptions({strokeColor: '#FFA500'})
+                        flightPath.setMap(map);
+                        tempLine = true;
+                        tempFP = flightPath;
+
+                        for(var j = 0; j < i; j++)
+                            pointsFP.pop();
+
+                        infoWindow.setContent("Invalid Path: Crosses Boundary");
+                        infoWindow.setPosition(coord);
+                        infoWindow.open(map);
+
+                        return false;
+                    }
                 }
 
-                // point A coordinates
-                var aLat = coordinates[0].lat();
-                var aLng = coordinates[0].lng();
 
-                // point B coordinates
-                var bLat = coordinates[1].lat();
-                var bLng = coordinates[1].lng();
-
-                // calculate distance between two points
-                var d = Math.sqrt(Math.pow((bLat - aLat), 2) + Math.pow((bLng - aLng), 2));
-
-                var step = 100;
-                var x;
-                var y;
-                var t;
-
-                for(var i = 0; i < step; i++){
-
-                    t = i / step;
-
-                    x = (1-t) * aLat + t * bLat;
-                    y = (1-t) * aLng + t * bLng;
-
-                    var coord = new google.maps.LatLng(x,y);
-
-                    if(boundMode == true) {
-                        if(google.maps.geometry.poly.containsLocation(coord, boundary) == false) {
+                if(noFlyMode == true) {
+                    for(var j = 0; j < noflyzone.length; j++) {
+                        if(google.maps.geometry.poly.containsLocation(coord, noflyzone[j]) == true) {
                             flightPath.setOptions({strokeColor: '#FFA500'})
                             flightPath.setMap(map);
                             tempLine = true;
                             tempFP = flightPath;
 
-                            infoWindow.setContent("Invalid Path: Crosses Boundary");
+                            for(var k = 0; k < i; k++)
+                                pointsFP.pop();
+
+                            infoWindow.setContent("Invalid Path: Enters No-Fly Zone");
                             infoWindow.setPosition(coord);
                             infoWindow.open(map);
 
                             return false;
                         }
                     }
-
-
-                    if(noFlyMode == true) {
-                        for(var j = 0; j < noflyzone.length; j++) {
-                            if(google.maps.geometry.poly.containsLocation(coord, noflyzone[j]) == true) {
-                                flightPath.setOptions({strokeColor: '#FFA500'})
-                                flightPath.setMap(map);
-                                tempLine = true;
-                                tempFP = flightPath;
-
-                                infoWindow.setContent("Invalid Path: Enters No-Fly Zone");
-                                infoWindow.setPosition(coord);
-                                infoWindow.open(map);
-
-                                return false;
-                            }
-                        }
-                    }
                 }
+
 
             }
 
+            tempPoints = pointsFP.slice();
             tempLine = false;
             FPlines.push(flightPath);
 
@@ -390,6 +405,53 @@
 
         flightPath.setMap(map);
         return true;
+    }
+
+    function plotDrone() {
+
+        var image = 'http://i1373.photobucket.com/albums/ag379/brynpnd/kingair_zpscbw1omfz.png';
+
+        // create a marker at the given latitude and longitude
+        droneMarker = new google.maps.Marker({
+            position: startingPoint,
+            map: map,
+            icon: image,
+            zIndex: 3
+        });
+
+    }
+
+    function updateDrone() {
+
+        droneMarker.setPosition(pointsFP[FPindex]);
+        FPindex += 6;
+/*
+        var string = FPindex.toString();
+        infoWindow.setContent(string);
+        infoWindow.setPosition(startingPoint);
+        infoWindow.open(map);
+*/
+        if(FPindex < pointsFP.length) {
+            return true;
+        }
+
+        else {
+            droneMarker.setPosition(endPoint);
+            resetDrone();
+            return false;
+        }
+
+    }
+
+    function resetDrone() {
+
+        droneMarker.setPosition(startingPoint);
+        FPindex = 0;
+
+    }
+
+    function removeDrone() {
+        droneMarker.setMap(null);
     }
 
     function removeLines() {
