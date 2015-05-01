@@ -31,6 +31,7 @@ Map::Map(QWidget *parent)
     noFlyIndex = 0;
     FPIndex = 0;
     timerOn = false;
+    simDrift = false;
 
     QString content;
     QString fileName = ":/index.html";
@@ -263,6 +264,8 @@ void Map::showSimInput() {
     ui->simReset->setEnabled(false);
     ui->simFinish->setHidden(false);
     ui->driftBox->setHidden(false);
+
+    ui->simFlight->setEnabled(false);
 
     ui->createFP->setEnabled(false);
 }
@@ -979,29 +982,62 @@ void Map::on_simFlight_clicked()
 
 void Map::on_startSim_clicked()
 {
+        isDrifting.setValue(false);
         timerOn = true;
         timerId = startTimer(1000);
         ui->simReset->setEnabled(true);
+        ui->driftBox->setEnabled(false);
+        ui->startSim->setEnabled(false);
 }
 
 void Map::timerEvent(QTimerEvent *event) {
     qDebug() << "Update...";
 
-    QString updateDrone = QString("updateDrone();");
-    QVariant continueSim = ui->webView->page()->mainFrame()->evaluateJavaScript(updateDrone);
+    if(!simDrift) {
+        QString updateDrone = QString("updateDrone();");
+        QVariant continueSim = ui->webView->page()->mainFrame()->evaluateJavaScript(updateDrone);
 
-    qDebug() << continueSim.toBool();
+        qDebug() << continueSim.toBool();
 
-    if(continueSim.toBool() == false)
-        killTimer(timerId);
+        if(continueSim.toBool() == false)
+            killTimer(timerId);
+    }
+
+    else {
+
+        if(isDrifting.toBool() == true) {
+            QString returnHome = QString("returnHome();");
+            ui->webView->page()->mainFrame()->evaluateJavaScript(returnHome);
+
+            simDrift = false;
+
+        }
+
+        else {
+
+            QString driftDrone = QString("driftDrone();");
+            isDrifting = ui->webView->page()->mainFrame()->evaluateJavaScript(driftDrone);
+
+            qDebug() << isDrifting.toBool();
+
+        }
+    }
 }
 
 void Map::on_simReset_clicked()
 {
+    resetDroneSim();
+}
+
+void Map::resetDroneSim() {
+
     killTimer(timerId);
 
     QString resetDrone = QString("resetDrone();");
     ui->webView->page()->mainFrame()->evaluateJavaScript(resetDrone);
+    ui->driftBox->setEnabled(true);
+    ui->startSim->setEnabled(true);
+    ui->simReset->setEnabled(false);
 }
 
 void Map::on_simFinish_clicked()
@@ -1013,4 +1049,12 @@ void Map::on_simFinish_clicked()
     ui->webView->page()->mainFrame()->evaluateJavaScript(removeDrone);
 
     hideFPInput();
+}
+
+void Map::on_driftBox_clicked(bool checked)
+{
+    if(checked)
+        simDrift = true;
+    else
+        simDrift = false;
 }

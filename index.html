@@ -29,6 +29,8 @@
     var pointsFP = [];
     var tempPoints = [];
     var FPindex = 0;
+    var driftCircle;
+    var wasDrifting = false;
 
     var lines = [];
     var FPlines = [];
@@ -443,7 +445,71 @@
 
     }
 
+    function driftDrone() {
+
+        if(FPindex <= 50) {
+            dronePosition = pointsFP[FPindex];
+            FPindex += 6;
+        }
+        else {
+            newLat = dronePosition.lat() + 0.0002;
+            newLng = dronePosition.lng() + 0.0002;
+            dronePosition = new google.maps.LatLng(newLat,newLng);
+        }
+
+        droneMarker.setPosition(dronePosition);
+
+        var circleOptions = {
+   //         map: map,
+            center: dronePosition,
+            radius: 50
+        }
+
+        // if the circle has been defined
+        if(typeof driftCircle !== 'undefined')
+            driftCircle.setMap(null);
+
+        driftCircle = new google.maps.Circle(circleOptions);
+
+        var numPoints = 0;
+        for(var j = 0; j < pointsFP.length; j++) {
+            if(google.maps.geometry.spherical.computeDistanceBetween(pointsFP[j],driftCircle.getCenter()) > driftCircle.getRadius())
+                numPoints++;
+        }
+
+        if(numPoints == pointsFP.length)
+            return true;
+
+        return false;
+
+    }
+
+    function returnHome() {
+
+        tempPoints = pointsFP.slice();
+        pointsFP = [];
+        FPindex = 0;
+        drawPolyLine(startingPoint.lat(),startingPoint.lng(),dronePosition.lat(),dronePosition.lng(),3,-1);
+        endPoint = startingPoint;
+
+
+        var string = 'Drifting from flight path! Returning home...';
+
+        infoWindow.setContent(string);
+        infoWindow.setPosition(dronePosition);
+        infoWindow.open(map);
+
+        wasDrifting = true;
+    }
+
     function resetDrone() {
+
+        if(wasDrifting == true) {
+            var driftLine = FPlines.pop();
+            driftLine.setMap(null);
+            wasDrifting = false;
+            pointsFP = tempPoints;
+        }
 
         droneMarker.setPosition(startingPoint);
         FPindex = 0;

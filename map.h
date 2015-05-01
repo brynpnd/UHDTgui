@@ -41,6 +41,8 @@ public:
     void clearNoFlyCoordinates(void);
     void listFPCoordinates(void);
 
+    void resetDroneSim(void);
+
 private:
     Ui::Map *ui;
     Container boundLats;
@@ -52,6 +54,8 @@ private:
 
     int timerId;
     bool timerOn;
+    bool simDrift;
+    QVariant isDrifting;
 
     int boundIndex;
     int noFlyIndex;
@@ -88,6 +92,7 @@ private slots:
     void on_startSim_clicked();
     void on_simReset_clicked();
     void on_simFinish_clicked();
+    void on_driftBox_clicked(bool checked);
 };
 
 #endif // MAP_H
